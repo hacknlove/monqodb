@@ -18,15 +18,11 @@
     "type" : "git",
     "url" : "https://github.com/crowdference/monqodb.git"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "dependencies": {
     "lodash": "^2.4.1",
     "mongodb": "^1.4.25",
     "q": "^1.1.2"
-  },
-  "engines": {
-    "node": ">=0.8.0",
-    "npm": "1.2.x"
   }
 }

@@ -1,5 +1,6 @@
 'use strict';
 var MongoClient   = require('mongodb').MongoClient,
+ObjectID      = require('mongodb').ObjectID,
 _             = require('lodash'),
 Q             = require('q'     ),
 qfiki = function(collection){
@@ -54,6 +55,8 @@ that = function(config){
   });
   return Q.all(promises);
 };
+
+that.ObjectID = ObjectID;
 that.__connections = {};
 that.__defaultOptions= {
   db:{
