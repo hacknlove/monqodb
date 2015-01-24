@@ -56,6 +56,12 @@ that = function(config){
   return Q.all(promises);
 };
 
+that.close = function(){
+  Object.keys(that.__connections).forEach(function(db){
+    that.__connections[db].close();
+  });
+};
+
 that.ObjectID = ObjectID;
 that.__connections = {};
 that.__defaultOptions= {

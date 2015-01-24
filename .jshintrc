@@ -1,0 +1,24 @@
+{
+  "node": true,
+  "esnext": true,
+  "bitwise": true,
+  "eqeqeq": true,
+  "immed": true,
+  "latedef": true,
+  "newcap": false,
+  "noarg": true,
+  "regexp": true,
+  "undef": true,
+  "smarttabs": true,
+  "asi": true,
+  "debug": true,
+  "expr": true,
+  "globals": {
+    "describe":false,
+    "it":false,
+    "before":false,
+    "beforeEach":false,
+    "after":false,
+    "afterEach":false
+  }
+}
