@@ -109,8 +109,8 @@ On top of that, monqodb adds the `toArray` with which `someCollection.find(someO
 
 ### goodies
 
-  `monqodb.ObjectID` has `ObjectID` 
-  `monqodb.close()` closes all monqodb connections.
+* `monqodb.ObjectID` has `ObjectID` 
+* `monqodb.close()` closes all monqodb connections.
 
 ### using the mongo native api
 
