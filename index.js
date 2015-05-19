@@ -63,6 +63,7 @@ that.close = function(){
 };
 
 that.ObjectID = ObjectID;
+that.ObjectId = ObjectID;
 that.__connections = {};
 that.__defaultOptions= {
   db:{
