@@ -1,9 +1,9 @@
 'use strict';
-var MongoClient   = require('mongodb').MongoClient,
-ObjectID      = require('mongodb').ObjectID,
-_             = require('lodash'),
-Q             = require('q'     ),
-qfiki = function(collection){
+var MongoClient   = require('mongodb').MongoClient;
+var ObjectID      = require('mongodb').ObjectID;
+var _             = require('lodash');
+var Q             = require('q'     );
+var qfiki = function(collection){
   var response = {
     collection:collection,
     toArray : function(selector,fields,options){
@@ -17,8 +17,10 @@ qfiki = function(collection){
   });
 
   return response;
-},
-that = function(config){
+};
+var connections = [];
+
+var that = function(config, priv){
   if(config===undefined){
     var mongoHost = process.env.MONGO_PORT_27017_TCP_ADDR || process.env.MONGO_ADDR || 'localhost',
     mongoPort = process.env.MONGO_PORT_27017_TCP_PORT||process.env.MONGO_PORT || 27017,
@@ -28,17 +30,25 @@ that = function(config){
     config[mongoName] = {url:'mongodb://'+mongoHost+':'+mongoPort+'/'+mongoDatabase};
   }
   var promises = [];
+  var response = {};
+  
   Object.keys(config).forEach(function(connection){
-    var defer = Q.defer(),
-    options = _.assign({},connection.options, that.defaultOptions);
+    var defer = Q.defer();
+    var options = _.assign({},connection.options, that.defaultOptions);
+    
     promises.push(defer.promise);
+    response[connection] = {};
+
     MongoClient.connect( config[connection].url, options, function (err, db){
       if(err){
         throw err;
+      }      
+           
+      if(!priv){
+        that.__connections[connection] = db;
+        that[connection] = response[connection];
       }
-      that.__connections[connection] = db;
       
-      that[connection] = {};
       db.collections(function(err, collections){
         if(err){
           throw err;
@@ -47,13 +57,13 @@ that = function(config){
           if(collection.collectionName.match(/^system\./)){
             return;
           }
-          that[connection][collection.collectionName] = qfiki(collection);
+          response[connection][collection.collectionName] = qfiki(collection);
         });
         defer.resolve(true);
       });
     });
   });
-  return Q.all(promises);
+  return Q.all(promises).then(function(){return response;});
 };
 
 that.close = function(){
