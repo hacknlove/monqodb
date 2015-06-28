@@ -19,63 +19,71 @@ var qfiki = function(collection){
   return response;
 };
 var connections = [];
-
-var that = function(config, priv){
-  if(config===undefined){
-    var mongoHost = process.env.MONGO_PORT_27017_TCP_ADDR || process.env.MONGO_ADDR || 'localhost',
-    mongoPort = process.env.MONGO_PORT_27017_TCP_PORT||process.env.MONGO_PORT || 27017,
-    mongoDatabase = process.env.MONGO_PORT_27017_TCP_DATABASE||process.env.MONGO_DATABASE || 'test',
-    mongoName = process.env.MONGO_PORT_27017_TCP_DATABASE||process.env.MONGO_DATABASE||process.env.MONGO_NAME || 'db';
-    config = {};
-    config[mongoName] = {url:'mongodb://'+mongoHost+':'+mongoPort+'/'+mongoDatabase};
-  }
-  var promises = [];
-  var response = {};
-  
-  Object.keys(config).forEach(function(connection){
-    var defer = Q.defer();
-    var options = _.assign({},connection.options, that.defaultOptions);
-    
-    promises.push(defer.promise);
-    response[connection] = {};
-
-    MongoClient.connect( config[connection].url, options, function (err, db){
-      if(err){
-        throw err;
-      }      
-           
-      if(!priv){
-        that.__connections[connection] = db;
-        that[connection] = response[connection];
+var MongoClientConnect = Q.nbind(MongoClient.connect, MongoClient);
+var procesarDatabase = function(local){
+  return Q.ninvoke(local.db, 'collections')
+  .then(function(collections){
+    local.glocal.response[local.name] = local.glocal.response[local.name] || {};
+    collections.forEach(function(collection){
+      if(collection.collectionName.match(/^system\./)){
+        return;
       }
-      
-      db.collections(function(err, collections){
-        if(err){
-          throw err;
-        }
-        collections.forEach(function(collection){
-          if(collection.collectionName.match(/^system\./)){
-            return;
-          }
-          response[connection][collection.collectionName] = qfiki(collection);
-        });
-        defer.resolve(true);
-      });
+      local.glocal.response[local.name][collection.collectionName] = qfiki(collection);
+      if(!local.glocal.priv){
+        module.exports[local.name][collection.collectionName] = local.glocal.response[local.name][collection.collectionName];
+      }
     });
   });
-  return Q.all(promises).then(function(){return response;});
 };
+var procesarDatabases = function(databases){
+  var glocal = this.glocal;
+  var db = this.db;
+  
+  return Q.all(databases.databases.map(function(database){
+    return procesarDatabase({glocal:glocal, db:db.db(database.name), name:database.name})
+  }));
+};
+var connect = function(connection){
+  var glocal = this;
 
-that.close = function(){
-  Object.keys(that.__connections).forEach(function(db){
-    that.__connections[db].close();
+  return MongoClientConnect(
+    glocal.config[connection].url,
+    _.assign({},connection.options, module.exports.defaultOptions
+  ))
+  .then(function(db){
+    if(glocal.config[connection].all){
+      return Q.ninvoke(db.admin(),'listDatabases').then(procesarDatabases.bind({glocal:glocal, db:db}));
+    }else{
+      return procesarDatabase({glocal:glocal, db:db, name:connection});
+    }
   });
 };
 
-that.ObjectID = ObjectID;
-that.ObjectId = ObjectID;
-that.__connections = {};
-that.__defaultOptions= {
+module.exports = function(config, priv){
+  if(config===undefined){
+    config = {
+      defauldb:{
+        url:'mongodb://localhost',
+        all:true
+      }
+    };
+  }
+  var glocal = {
+    config:config,
+    priv:priv,
+    response:{}
+  };
+  return Q.all(Object.keys(config).map(connect,glocal))
+  .then(function(){return glocal.response;});
+};
+module.exports.close = function(){
+  connections.forEach(function(db){
+    db.close();
+  });
+};
+module.exports.ObjectID = ObjectID;
+module.exports.ObjectId = ObjectID;
+module.exports.__defaultOptions= {
   db:{
     w:1,
   },
@@ -84,4 +92,3 @@ that.__defaultOptions= {
     auto_reconnect:true
   },
 };
-module.exports = that;
