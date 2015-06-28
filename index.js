@@ -24,6 +24,9 @@ var procesarDatabase = function(local){
   return Q.ninvoke(local.db, 'collections')
   .then(function(collections){
     local.glocal.response[local.name] = local.glocal.response[local.name] || {};
+    if(!local.glocal.priv){
+      module.exports[local.name] = module.exports[local.name] || {};
+    }
     collections.forEach(function(collection){
       if(collection.collectionName.match(/^system\./)){
         return;
