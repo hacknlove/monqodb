@@ -18,7 +18,7 @@ var qfiki = function(collection){
 
   return response;
 };
-var connections = [];
+var connections = {};
 var MongoClientConnect = Q.nbind(MongoClient.connect, MongoClient);
 var procesarDatabase = function(local){
   return Q.ninvoke(local.db, 'collections')
@@ -54,6 +54,7 @@ var connect = function(connection){
     _.assign({},connection.options, module.exports.defaultOptions
   ))
   .then(function(db){
+    connections[connection] = db;
     if(glocal.config[connection].all){
       return Q.ninvoke(db.admin(),'listDatabases').then(procesarDatabases.bind({glocal:glocal, db:db}));
     }else{
@@ -76,12 +77,27 @@ module.exports = function(config, priv){
     priv:priv,
     response:{}
   };
+  
+  glocal.response.load = function(conexion, databases){
+    return Q.all(databases.map(function(database){
+      return procesarDatabase({
+        glocal:glocal, 
+        db:connections[conexion].db(database), 
+        name:database
+      });
+    }))
+    .then(function(){
+      return glocal.response;
+    });
+  };
+
+  
   return Q.all(Object.keys(config).map(connect,glocal))
   .then(function(){return glocal.response;});
 };
 module.exports.close = function(){
-  connections.forEach(function(db){
-    db.close();
+  Object.keys(connections).forEach(function(db){
+    connections[db].close();
   });
 };
 module.exports.ObjectID = ObjectID;
