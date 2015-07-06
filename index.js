@@ -8,6 +8,27 @@ var qfiki = function(collection){
     collection:collection,
     toArray : function(selector,fields,options){
       return Q.ninvoke(collection.find(selector, fields, options), 'toArray');
+    },
+    each : function(selector, fields, callbak, options){
+      var defer = Q.defer();
+      var cursor = collection.find(selector, fields, options);
+      var promises = 0;
+      cursor.each(function(object){
+        promises +=1;
+        if(object===null){
+          promises -=1;
+          if(promises === 0){
+            return defer.resolve();
+          }
+        }
+        Q(callbak(object))
+        .done(function(){
+          promises-=1;
+          if(promises===0){
+            return defer.resolve();
+          }
+        });
+      });
     }
   };
   
