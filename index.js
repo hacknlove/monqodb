@@ -29,6 +29,7 @@ var qfiki = function(collection){
           }
         });
       });
+      return defer.promise;
     }
   };
   
