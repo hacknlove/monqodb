@@ -1,24 +1,29 @@
 {
   "name": "monqodb",
-  "description":"The mongodb Q promises wrapper that we use at Crowdference",
-  "keywords":["mongo","mongodb","Q","promises"],
-  "homepage":"https://github.com/crowdference/monqodb",
-  "bugs":{
-    "email":"antonio.fernandez@crowdference.org",
-    "url":"https://github.com/crowdference/monqodb/issues"
+  "description": "The mongodb Q promises wrapper that we use at Crowdference",
+  "keywords": [
+    "mongo",
+    "mongodb",
+    "Q",
+    "promises"
+  ],
+  "homepage": "https://github.com/crowdference/monqodb",
+  "bugs": {
+    "url": "https://github.com/crowdference/monqodb/issues",
+    "email": "antonio.fernandez@crowdference.org"
   },
-  "license":"GPL-2.0",
-  "author":{ 
-    "name" : "Antonio Fernández",
-    "email" : "antonio.fernandez@crowdference.org",
-    "url" : "http://blog.pykiss.com/"
+  "license": "GPL-2.0",
+  "author": {
+    "name": "Antonio Fernández",
+    "email": "antonio.fernandez@crowdference.org",
+    "url": "http://blog.pykiss.com/"
   },
-  "main":"monqodb",
-  "repository":{
-    "type" : "git",
-    "url" : "https://github.com/crowdference/monqodb.git"
+  "main": "monqodb",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crowdference/monqodb.git"
   },
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": false,
   "dependencies": {
     "lodash": "^2.4.1",
