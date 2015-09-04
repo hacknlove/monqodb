@@ -23,6 +23,7 @@ var qfiki = function(collection){
           if(promises === 0){
             return defer.resolve();
           }
+          return;
         }
         Q(callbak(object))
         .done(function(){
