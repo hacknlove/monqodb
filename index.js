@@ -13,7 +13,10 @@ var qfiki = function(collection){
       var defer = Q.defer();
       var cursor = collection.find(selector, fields, options);
       var promises = 0;
-      cursor.each(function(object){
+      cursor.each(function(error, object){
+        if (error) {
+          defer.reject(error);
+        }
         promises +=1;
         if(object===null){
           promises -=1;
