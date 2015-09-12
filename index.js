@@ -1,6 +1,7 @@
 'use strict';
 var MongoClient   = require('mongodb').MongoClient;
 var ObjectID      = require('mongodb').ObjectID;
+var BSON          = require('mongodb').BSON;
 var _             = require('lodash');
 var Q             = require('q'     );
 var qfiki = function(collection){
@@ -36,7 +37,7 @@ var qfiki = function(collection){
       return defer.promise;
     }
   };
-  
+
   ['findOne','update','insert','remove','distinct','count','findAndModify','findAndRemove','geoNear','geoHaystackSearch']
   .forEach(function(key){
     response[key] = Q.nbind(collection[key], collection);
@@ -67,7 +68,7 @@ var procesarDatabase = function(local){
 var procesarDatabases = function(databases){
   var glocal = this.glocal;
   var db = this.db;
-  
+
   return Q.all(databases.databases.map(function(database){
     return procesarDatabase({glocal:glocal, db:db.db(database.name), name:database.name})
   }));
@@ -103,12 +104,12 @@ module.exports = function(config, priv){
     priv:priv,
     response:{}
   };
-  
+
   glocal.response.load = function(conexion, databases){
     return Q.all(databases.map(function(database){
       return procesarDatabase({
-        glocal:glocal, 
-        db:connections[conexion].db(database), 
+        glocal:glocal,
+        db:connections[conexion].db(database),
         name:database
       });
     }))
@@ -117,7 +118,7 @@ module.exports = function(config, priv){
     });
   };
 
-  
+
   return Q.all(Object.keys(config).map(connect,glocal))
   .then(function(){return glocal.response;});
 };
@@ -128,6 +129,7 @@ module.exports.close = function(){
 };
 module.exports.ObjectID = ObjectID;
 module.exports.ObjectId = ObjectID;
+module.exports.BSON = BSON;
 module.exports.__defaultOptions= {
   db:{
     w:1,

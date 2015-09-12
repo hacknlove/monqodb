@@ -23,7 +23,7 @@
     "type": "git",
     "url": "git+https://github.com/crowdference/monqodb.git"
   },
-  "version": "0.4.3",
+  "version": "0.4.4",
   "private": false,
   "dependencies": {
     "lodash": "^2.4.1",
