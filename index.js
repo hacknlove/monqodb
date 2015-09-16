@@ -3,6 +3,8 @@
 var MongoClient = require('mongodb').MongoClient
 var ObjectID = require('mongodb').ObjectID
 var BSON = require('mongodb').BSON
+var MaxKey = require('mongodb').MaxKey
+var MinKey = require('mongodb').MinKey
 var _ = require('lodash')
 var Q = require('q')
 var qfiki = function (collection) {
@@ -130,6 +132,8 @@ module.exports.close = function () {
 module.exports.ObjectID = ObjectID
 module.exports.ObjectId = ObjectID
 module.exports.BSON = BSON
+module.exports.maxKey = new MaxKey()
+module.exports.minKey = new MinKey()
 module.exports.__defaultOptions = {
   db: {
     w: 1
